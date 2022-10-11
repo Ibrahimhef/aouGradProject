@@ -14,7 +14,7 @@ class CommentScreen extends StatefulWidget {
 class _CommentScreenState extends State<CommentScreen> {
   List<CommentModel> comments = [];
 
-  String? comment;
+  var msgController = TextEditingController();
   String username = AuthMethods().getUsername().toString();
 
   @override
@@ -36,12 +36,12 @@ class _CommentScreenState extends State<CommentScreen> {
                     text: TextSpan(children: [
                       TextSpan(
                         text: username,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black),
                       ),
                       TextSpan(
-                          text: comment,
+                          text: msgController.text,
                           style: TextStyle(color: Colors.black)),
                     ]),
                   ),
@@ -51,17 +51,31 @@ class _CommentScreenState extends State<CommentScreen> {
           ),
           TextField(
             textAlign: TextAlign.center,
+            ///to save data after press done after writing the comment
+            textInputAction: TextInputAction.done,
             decoration: kTextfeldDecor.copyWith(hintText: 'Enter your comment'),
-            onSubmitted: (String val){
-              comment = val;
+            ///store input in local variable using onChange
+            onChanged: (text){
               setState(() {
-                comments = [CommentModel(val, username)];
+                msgController.text = text;
               });
-             comments.forEach((element) {print(element.comment);
-             print(comments.length);});
+              print("onChanged ==> "+ text);
+            },
+            controller: msgController,
+            onSubmitted: (String val){
+              print("onSubmitted ==> "+ val);
+              setState(() {
+                ///add item to the list
+                comments.add(CommentModel(msgController.text, username));
+                ///redeclare variable
+                msgController.clear();
+              });
+             comments.forEach((element) {
+               print("onSubmitted ==> ${element.comment}");
+               print("comments length ==> "+ comments.length.toString());
+            });
             },
           ),
-
         ],
       ),
     );
